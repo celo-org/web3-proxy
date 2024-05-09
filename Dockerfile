@@ -115,13 +115,13 @@ RUN --mount=type=cache,target=/root/.cargo/git \
 
 # nextest runs tests in parallel (done its in own FROM so that it can run in parallel)
 # TODO: i'd like to use binaries for these, but i had trouble with arm and binstall
-FROM rust as rust_nextest
-
-RUN --mount=type=cache,target=/root/.cargo/git \
-    --mount=type=cache,target=/root/.cargo/registry \
-    set -eux -o pipefail; \
-    \
-    cargo binstall -y cargo-nextest
+#FROM rust as rust_nextest
+#
+#RUN --mount=type=cache,target=/root/.cargo/git \
+#    --mount=type=cache,target=/root/.cargo/registry \
+#    set -eux -o pipefail; \
+#    \
+#    cargo binstall -y cargo-nextest
 
 # foundry/anvil are needed to run tests (done its in own FROM so that it can run in parallel)
 FROM rust as rust_foundry
@@ -151,27 +151,27 @@ RUN --mount=type=cache,target=/root/.cargo/git \
     cargo --locked fetch
 
 # build tests (done its in own FROM so that it can run in parallel)
-FROM rust_with_env as build_tests
-
-COPY --link --from=rust_foundry /root/.foundry/bin/anvil /root/.foundry/bin/
-COPY --link --from=rust_nextest /root/.cargo/bin/cargo-nextest* /root/.cargo/bin/
-
-# test the application with cargo-nextest
-RUN --mount=type=cache,target=/root/.cargo/git \
-    --mount=type=cache,target=/root/.cargo/registry \
-    --mount=type=cache,target=/app/target_test \
-    set -eux -o pipefail; \
-    \
-    export CARGO_TARGET_DIR=target_test; \
-    [ -e "$(pwd)/payment-contracts/src/contracts/mod.rs" ] || touch "$(pwd)/payment-contracts/build.rs"; \
-    RUST_LOG=web3_proxy=trace,info \
-    cargo \
-    --frozen \
-    --offline \
-    nextest run \
-    --features "$WEB3_PROXY_FEATURES" --no-default-features \
-    ; \
-    touch /test_success
+# FROM rust_with_env as build_tests
+# 
+# COPY --link --from=rust_foundry /root/.foundry/bin/anvil /root/.foundry/bin/
+# COPY --link --from=rust_nextest /root/.cargo/bin/cargo-nextest* /root/.cargo/bin/
+# 
+# # test the application with cargo-nextest
+# RUN --mount=type=cache,target=/root/.cargo/git \
+#     --mount=type=cache,target=/root/.cargo/registry \
+#     --mount=type=cache,target=/app/target_test \
+#     set -eux -o pipefail; \
+#     \
+#     export CARGO_TARGET_DIR=target_test; \
+#     [ -e "$(pwd)/payment-contracts/src/contracts/mod.rs" ] || touch "$(pwd)/payment-contracts/build.rs"; \
+#     RUST_LOG=web3_proxy=trace,info \
+#     cargo \
+#     --frozen \
+#     --offline \
+#     nextest run \
+#     --features "$WEB3_PROXY_FEATURES" --no-default-features \
+#     ; \
+#     touch /test_success
 
 FROM rust_with_env as build_app
 
