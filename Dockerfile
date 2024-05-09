@@ -210,6 +210,9 @@ RUN set -eux; \
     adduser --home /llama --shell /sbin/nologin --gecos '' --no-create-home --disabled-password --uid 1001 llama; \
     chown -R llama /llama
 
+RUN apt-get update && \
+    apt-get install -y gettext
+
 USER llama
 
 ENTRYPOINT ["web3_proxy_cli"]

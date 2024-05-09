@@ -1,0 +1,26 @@
+---
+name: Build and Sign Llama Web3 Proxy Container
+
+on:
+  push:
+    branches:
+      - "master"
+  workflow_dispatch:
+
+jobs:
+  build-container-llama-web3-proxy:
+    uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v2.0.4
+    name: Build Llama Web3 Proxy image container
+    permissions:
+      contents: read
+      id-token: write
+      security-events: write
+    with:
+      artifact-registry: us-west1-docker.pkg.dev/devopsre/dev-images/llama-web3-proxy
+      tags: test
+      platforms: linux/amd64
+      workload-id-provider: projects/1094498259535/locations/global/workloadIdentityPools/gh-llama-web3-proxy/providers/github-by-repos
+      service-account: llama-web3-proxy@devopsre.iam.gserviceaccount.com
+      context: .
+      file: Dockerfile
+      trivy: false
