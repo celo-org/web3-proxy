@@ -196,7 +196,7 @@ RUN --mount=type=cache,target=/root/.cargo/git \
 
 # copy this file so that docker actually creates the build_tests container
 # without this, the runtime container doesn't need build_tests and so docker build skips it
-COPY --link --from=build_tests /test_success /
+#COPY --link --from=build_tests /test_success /
 
 #
 # We do not need the Rust toolchain or any deps to run the binary!
